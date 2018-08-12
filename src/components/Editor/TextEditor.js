@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Editor } from 'slate-react';
 
-import InitialValue from '../utils/InitialValue';
+import InitialValue from '../../utils/InitialValue';
 
 import Icon from 'react-icons-kit';
 import { bold } from 'react-icons-kit/feather/bold';
@@ -14,14 +14,25 @@ import { link2 } from 'react-icons-kit/feather/link2';
 import { ic_title } from 'react-icons-kit/md/ic_title';
 import { ic_format_quote } from 'react-icons-kit/md/ic_format_quote';
 import { BoldMark, ItalicMark, FormatToolbar } from './index';
+import {setStorage,getStorage} from '../../utils/local-storage-helper';
 
 export default class TextEditor extends Component {
-	state = {
-		value: InitialValue,
-	};
-
+	constructor(props) {
+		super(props);
+		console.log('aa',this.props.initialValue)
+		this.state = {
+			value: this.props.initialValue,
+		};
+	}
+	
+onSave = (value) => {
+	let stringData = JSON.stringify(value);
+	console.log(value);
+	console.log(JSON.parse(stringData));
+}
 	// On change, update the app's React state with the new editor value.
 	onChange = ({ value }) => {
+		console.log('Value', value)
 		this.setState({ value });
 	};
 
@@ -212,6 +223,7 @@ export default class TextEditor extends Component {
 
 	render() {
 		return (
+			<div>
 			<Fragment>
 				<FormatToolbar>
 					{this.renderMarkIcon('title', ic_title)}
@@ -229,8 +241,19 @@ export default class TextEditor extends Component {
 					onKeyDown={this.onKeyDown}
 					renderMark={this.renderMark}
 					renderNode={this.renderNode}
-				/>
+					/>
+			
 			</Fragment>
+			<br /> <br />
+			<div className="container">
+			<div className="row">
+				<div className="col-md-5">
+					<button className="btn btn-sm btn-default" onClick={(value) => this.onSave(this.state.value)}>Save</button>
+					<button className="btn btn-sm btn-default float-right">Cancel</button>
+				</div>
+			</div>
+			</div>
+			</div>
 		);
 	}
 }
