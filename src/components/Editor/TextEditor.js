@@ -27,8 +27,10 @@ export default class TextEditor extends Component {
 	
 onSave = (value) => {
 	let stringData = JSON.stringify(value);
-	console.log(value);
-	console.log(JSON.parse(stringData));
+	setStorage(stringData);
+}
+onCancel = () => {
+	this.setState({value: this.props.initialValue});
 }
 	// On change, update the app's React state with the new editor value.
 	onChange = ({ value }) => {
@@ -249,7 +251,7 @@ onSave = (value) => {
 			<div className="row">
 				<div className="col-md-5">
 					<button className="btn btn-sm btn-default" onClick={(value) => this.onSave(this.state.value)}>Save</button>
-					<button className="btn btn-sm btn-default float-right">Cancel</button>
+					<button className="btn btn-sm btn-default float-right" onClick={() => this.onCancel()}>Cancel</button>
 				</div>
 			</div>
 			</div>
