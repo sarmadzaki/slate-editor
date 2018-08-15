@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Editor } from 'slate-react';
-
-import InitialValue from '../../utils/InitialValue';
-
+import EditList from 'slate-edit-list'
 import Icon from 'react-icons-kit';
 import { bold } from 'react-icons-kit/feather/bold';
 import { italic } from 'react-icons-kit/feather/italic';
@@ -12,9 +10,10 @@ import { underline } from 'react-icons-kit/feather/underline';
 import { link2 } from 'react-icons-kit/feather/link2';
 
 import { ic_title } from 'react-icons-kit/md/ic_title';
+import {ic_image} from 'react-icons-kit/md/ic_image'
 import { ic_format_quote } from 'react-icons-kit/md/ic_format_quote';
 import { BoldMark, ItalicMark, FormatToolbar } from './index';
-import {setStorage,getStorage} from '../../utils/local-storage-helper';
+import {setStorage, buildFileSelector} from '../../utils/local-storage-helper';
 
 export default class TextEditor extends Component {
 	constructor(props) {
@@ -22,8 +21,10 @@ export default class TextEditor extends Component {
 		console.log('aa',this.props.initialValue)
 		this.state = {
 			value: this.props.initialValue,
+			pluginsArray: [EditList()]
 		};
 	}
+
 	
 onSave = (value) => {
 	let stringData = JSON.stringify(value);
@@ -196,7 +197,6 @@ onCancel = () => {
 			<Icon icon={icon} />
 		</button>
 	);
-
 	onMarkClick = (e, type) => {
 		/* disabling browser default behavior like page refresh, etc */
 		e.preventDefault();
@@ -222,7 +222,23 @@ onCancel = () => {
 			<Icon icon={icon} />
 		</button>
 	);
+	renderImageIcon = (type, icon) => (
+		<button
+		onPointerDown={(e) => this.onImageClick(e, type)}
+		className="tooltip-icon-button"
+	>
+		<Icon icon={icon} />
+	</button>
+	);
+onImageClick = (e, type) => {
+	e.preventDefault();
+	let a  = buildFileSelector(e);
+	// console.log(a);
+	a.click();
+	console.log(a.value)
+	const { value } = this.state;
 
+}
 	render() {
 		return (
 			<div>
@@ -236,6 +252,7 @@ onCancel = () => {
 					{this.renderMarkIcon('underline', underline)}
 					{this.renderMarkIcon('quote', ic_format_quote)}
 					{this.renderLinkIcon('link', link2)}
+					{this.renderImageIcon('image', ic_image)}
 				</FormatToolbar>
 				<Editor
 					value={this.state.value}
@@ -243,6 +260,9 @@ onCancel = () => {
 					onKeyDown={this.onKeyDown}
 					renderMark={this.renderMark}
 					renderNode={this.renderNode}
+					spellCheck={true}
+					tabIndex={3}
+					plugins={this.state.pluginsArray}
 					/>
 			
 			</Fragment>
