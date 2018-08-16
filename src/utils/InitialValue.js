@@ -1,5 +1,5 @@
 import { Value } from 'slate';
-import { getStorage } from './local-storage-helper';
+import { getStorage } from './helper';
 let valueFromStorage = JSON.parse(getStorage('value'));
 const initialValue = Value.fromJSON( valueFromStorage || {
 		document: {

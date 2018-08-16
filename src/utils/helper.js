@@ -9,13 +9,9 @@ export const getStorage = (key) => {
 }
 export function buildFileSelector(){
     const fileSelector = document.createElement('input');
-    fileSelector.setAttribute('type', 'file');
+   fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('multiple', 'multiple');
     return fileSelector;
   }
 
-  function uploadImage() {
-      new Promise((resolve,reject) => {
-          
-      })
-  }
+  

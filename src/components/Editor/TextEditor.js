@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Editor } from 'slate-react';
-import EditList from 'slate-edit-list'
+// import EditList from 'slate-edit-list'
 import Icon from 'react-icons-kit';
 import { bold } from 'react-icons-kit/feather/bold';
 import { italic } from 'react-icons-kit/feather/italic';
@@ -10,29 +10,28 @@ import { underline } from 'react-icons-kit/feather/underline';
 import { link2 } from 'react-icons-kit/feather/link2';
 
 import { ic_title } from 'react-icons-kit/md/ic_title';
-import {ic_image} from 'react-icons-kit/md/ic_image'
+import { ic_image } from 'react-icons-kit/md/ic_image'
 import { ic_format_quote } from 'react-icons-kit/md/ic_format_quote';
 import { BoldMark, ItalicMark, FormatToolbar } from './index';
-import {setStorage, buildFileSelector} from '../../utils/local-storage-helper';
-
+import { setStorage, buildFileSelector } from '../../utils/helper';
+import Images from './image'
 export default class TextEditor extends Component {
 	constructor(props) {
 		super(props);
-		console.log('aa',this.props.initialValue)
 		this.state = {
 			value: this.props.initialValue,
-			pluginsArray: [EditList()]
+			// pluginsArray: [EditList()]
 		};
 	}
 
-	
-onSave = (value) => {
-	let stringData = JSON.stringify(value);
-	setStorage(stringData);
-}
-onCancel = () => {
-	this.setState({value: this.props.initialValue});
-}
+
+	onSave = (value) => {
+		let stringData = JSON.stringify(value);
+		setStorage(stringData);
+	}
+	onCancel = () => {
+		this.setState({ value: this.props.initialValue });
+	}
 	// On change, update the app's React state with the new editor value.
 	onChange = ({ value }) => {
 		console.log('Value', value)
@@ -180,9 +179,9 @@ onCancel = () => {
 
 			href.length > 0
 				? change
-						.insertText(text)
-						.extend(0 - text.length)
-						.call(this.wrapLink, href)
+					.insertText(text)
+					.extend(0 - text.length)
+					.call(this.wrapLink, href)
 				: null;
 		}
 
@@ -223,58 +222,87 @@ onCancel = () => {
 		</button>
 	);
 	renderImageIcon = (type, icon) => (
-		<button
-		onPointerDown={(e) => this.onImageClick(e, type)}
-		className="tooltip-icon-button"
-	>
-		<Icon icon={icon} />
-	</button>
+		<span>
+			<input id='fileid' type='file' hidden />
+			<button
+				onPointerDown={(e) => this.onImageClick(e, type)}
+				className="tooltip-icon-button"
+			>
+				<Icon icon={icon} />
+			</button>
+		</span>
 	);
-onImageClick = (e, type) => {
-	e.preventDefault();
-	let a  = buildFileSelector(e);
-	// console.log(a);
-	a.click();
-	console.log(a.value)
-	const { value } = this.state;
+	onImageClick = (e, type) => {
+		let base64;
+		e.preventDefault();
+		document.getElementById('fileid').click();
+		document.getElementById('fileid').addEventListener('change', (e) => {
+			console.log(e.target.files[0])
+			var reader = new FileReader();
+			reader.readAsDataURL(e.target.files[0]);
+			reader.onload =  () => {
+				base64 = reader.result;
+				let src = base64
+				console.log(this.state.value);
+				let change = this.state.value.change().call(this.insertImage, src);
+				console.log(change)
+				this.onChange(change);
+			};
+			reader.onerror = function (error) {
+				console.log('Error: ', error);
+			};
+		});
 
-}
+		const { value } = this.state;
+
+	}
+
+	insertImage(change, src, target) {
+		if (target) {
+			change.select(target)
+		}
+		change.insertBlock({
+			type: 'image',
+			isVoid: true,
+			data: { src },
+		})
+	}
+
 	render() {
 		return (
 			<div>
-			<Fragment>
-				<FormatToolbar>
-					{this.renderMarkIcon('title', ic_title)}
-					{this.renderMarkIcon('bold', bold)}
-					{this.renderMarkIcon('italic', italic)}
-					{this.renderMarkIcon('code', code)}
-					{this.renderMarkIcon('list', list)}
-					{this.renderMarkIcon('underline', underline)}
-					{this.renderMarkIcon('quote', ic_format_quote)}
-					{this.renderLinkIcon('link', link2)}
-					{this.renderImageIcon('image', ic_image)}
-				</FormatToolbar>
-				<Editor
-					value={this.state.value}
-					onChange={this.onChange}
-					onKeyDown={this.onKeyDown}
-					renderMark={this.renderMark}
-					renderNode={this.renderNode}
-					spellCheck={true}
-					tabIndex={3}
-					plugins={this.state.pluginsArray}
+				<Fragment>
+					<FormatToolbar>
+						{this.renderMarkIcon('title', ic_title)}
+						{this.renderMarkIcon('bold', bold)}
+						{this.renderMarkIcon('italic', italic)}
+						{this.renderMarkIcon('code', code)}
+						{this.renderMarkIcon('list', list)}
+						{this.renderMarkIcon('underline', underline)}
+						{this.renderMarkIcon('quote', ic_format_quote)}
+						{this.renderLinkIcon('link', link2)}
+						{this.renderImageIcon('image', ic_image)}
+					</FormatToolbar>
+					<Editor
+						value={this.state.value}
+						onChange={this.onChange}
+						onKeyDown={this.onKeyDown}
+						renderMark={this.renderMark}
+						renderNode={this.renderNode}
+						spellCheck={true}
+						tabIndex={3}
 					/>
-			
-			</Fragment>
-			<br /> <br />
-			<div className="container">
-			<div className="row">
-				<div className="col-md-5">
-					<button className="btn btn-sm btn-default" onClick={(value) => this.onSave(this.state.value)}>Save</button>
-					<button className="btn btn-sm btn-default float-right" onClick={() => this.onCancel()}>Cancel</button>
+
+				</Fragment>
+				<br /> <br />
+				<div className="container">
+					<div className="row">
+						<div className="col-md-5">
+							<button className="btn btn-sm btn-default" onClick={(value) => this.onSave(this.state.value)}>Save</button>
+							<button className="btn btn-sm btn-default float-right" onClick={() => this.onCancel()}>Cancel</button>
+						</div>
+					</div>
 				</div>
-			</div>
-			</div>
 			</div>
 		);
 	}
