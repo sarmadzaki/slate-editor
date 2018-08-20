@@ -13,5 +13,3 @@ export function buildFileSelector(){
     fileSelector.setAttribute('multiple', 'multiple');
     return fileSelector;
   }
-
-  

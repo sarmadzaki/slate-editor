@@ -13,8 +13,11 @@ import { ic_title } from 'react-icons-kit/md/ic_title';
 import { ic_image } from 'react-icons-kit/md/ic_image'
 import { ic_format_quote } from 'react-icons-kit/md/ic_format_quote';
 import { BoldMark, ItalicMark, FormatToolbar } from './index';
-import { setStorage, buildFileSelector } from '../../utils/helper';
+import { setStorage, getStorage} from '../../utils/helper';
 import Images from './image'
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export default class TextEditor extends Component {
 	constructor(props) {
 		super(props);
@@ -28,6 +31,7 @@ export default class TextEditor extends Component {
 	onSave = (value) => {
 		let stringData = JSON.stringify(value);
 		setStorage(stringData);
+		toast("Your Changes Have Been Saved")
 	}
 	onCancel = () => {
 		this.setState({ value: this.props.initialValue });
@@ -103,6 +107,10 @@ export default class TextEditor extends Component {
 						{props.children}
 					</a>
 				);
+			}
+			case "image": {
+				const src = props.node.data.get("src");
+				return <img width="200px" height="200px" src={src} {...props.attributes} />;
 			}
 
 			default: {
@@ -240,7 +248,7 @@ export default class TextEditor extends Component {
 			console.log(e.target.files[0])
 			var reader = new FileReader();
 			reader.readAsDataURL(e.target.files[0]);
-			reader.onload =  () => {
+			reader.onload = () => {
 				base64 = reader.result;
 				let src = base64
 				console.log(this.state.value);
@@ -271,6 +279,7 @@ export default class TextEditor extends Component {
 	render() {
 		return (
 			<div>
+				<ToastContainer />
 				<Fragment>
 					<FormatToolbar>
 						{this.renderMarkIcon('title', ic_title)}
